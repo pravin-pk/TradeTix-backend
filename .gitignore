@@ -1,0 +1,24 @@
+# Node.js
+node_modules/
+
+# Express generated files
+dist/
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+
+# Dependency lock files
+package-lock.json
+yarn.lock
+
+# IDE files
+.vscode/
+.idea/
+
+# Build output
+build/
+dist/
