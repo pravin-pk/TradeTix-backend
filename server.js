@@ -2,8 +2,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
+import userRouter from './routes/user';
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(bodyParser.json());
@@ -13,7 +15,7 @@ mongoose.connect('mongodb://localhost:27017/tradeTix-DB')
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Error connecting to MongoDB', err));
 
-app.get('api/ping', (req, res) => {
+app.get('/api/ping', (req, res) => {
     res.send('Pong');
 });
 
@@ -24,7 +26,9 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-app.post('api/signup', async (req, res) => {
+app.use('/api/users', userRouter);
+
+app.post('/api/signup', async (req, res) => {
     try {
         const { username, name, email, password } = req.body;
 
@@ -44,7 +48,7 @@ app.post('api/signup', async (req, res) => {
     }
 });
 
-app.post('api/signin', async (req, res) => {
+app.post('/api/signin', async (req, res) => {
     try {
         const { username, password } = req.body;
 
