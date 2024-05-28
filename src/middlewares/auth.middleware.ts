@@ -17,15 +17,20 @@ const auth = async (req: CustomRequest, res: Response, next: NextFunction) => {
         if(!token) {
             throw new Error('Please authenticate');
         }
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
         const user = await User.findOne({ _id: decoded._id, 'tokens.token': token });
+        
         if(!user) {
             throw new Error('Please authenticate');
         }
+        
         req.user = user;
         req.token = token;
         next();
-    } catch(e) {
+    } catch(e: any) {
         res.status(401).send({ error: e.message });
     }
 }
+
+export default auth;
