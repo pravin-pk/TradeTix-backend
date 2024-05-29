@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import { setupSwagger } from './configs/swagger.config';
+import cors from 'cors';
 
 // Routes
 import userRouter from './routers/user.router';
@@ -11,6 +12,7 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(bodyParser.json());
+app.use(cors());
 
 // MongoDB Connection
 mongoose.connect('mongodb://localhost:27017/tradeTix-DB')
@@ -21,7 +23,7 @@ mongoose.connect('mongodb://localhost:27017/tradeTix-DB')
 setupSwagger(app);
 
 app.get('/api/ping', (req, res) => {
-    res.send('Pong');
+    res.send({ response: 'pong'});
 });
 
 app.use('/api/users', userRouter);
