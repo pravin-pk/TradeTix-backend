@@ -23,9 +23,6 @@ jobs:
             - name: Build the Docker image
               run: docker build -t ${{ secrets.REGISTRY }}/tradetix:latest -f k8s/Dockerfile .
 
-            - name: Docker run the image
-              run: docker run -p 3001:3001 ${{ secrets.REGISTRY }}/tradetix:latest
-
             - name: Log in to the Container registry
               uses: docker/login-action@v3.1.0
               with:
