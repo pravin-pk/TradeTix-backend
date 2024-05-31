@@ -6,6 +6,7 @@ import cors from 'cors';
 
 // Routes
 import userRouter from './routers/user.router';
+import ticketRouter from './routers/ticket.router';
 
 require('dotenv').config()
 
@@ -29,6 +30,7 @@ app.get('/api/ping', (req, res) => {
 });
 
 app.use('/api/users', userRouter);
+app.use('/api/tickets', ticketRouter);
 
 
 app.listen(PORT, () => {
