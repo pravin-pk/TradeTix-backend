@@ -76,15 +76,16 @@ router.post('/register', async (req: Request, res: Response) => {
  *         description: Error occurred
  */
 router.post('/login', async (req: Request, res: Response) => {
-    const user: Partial<IUser> = {
-        email: req.body.email,
-        password: req.body.password
+    try {
+        const user: Partial<IUser> = {
+            email: req.body.email,
+            password: req.body.password
+        }
+        const loggedInUser = await loginUser(user);
+        return res.send({ loggedInUser });
+    } catch(error: any) {
+        return res.status(400).send({ error: error.message });
     }
-    const loggedInUser = await loginUser(user);
-    if (loggedInUser?.error) {
-        return res.status(400).send({ error: loggedInUser.error });
-    }
-    return res.send({ loggedInUser });
 })
 
 
