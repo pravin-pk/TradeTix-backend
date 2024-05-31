@@ -1,8 +1,16 @@
 import express from "express";
-import { Request , Response } from "express";
-import { createTicket, deleteTicket, getOpenTickets } from "../controllers/ticket.controller";
+import { Request, Response } from "express";
+import {
+  createTicket,
+  deleteTicket,
+  getOpenTickets,
+  getTicketById,
+} from "../controllers/ticket.controller";
 import auth, { CustomRequest } from "../middlewares/auth.middleware";
-import { createErrorResponse, createResponse } from "../utils/responseHandler.util";
+import {
+  createErrorResponse,
+  createResponse,
+} from "../utils/responseHandler.util";
 
 const router = express.Router();
 
@@ -11,7 +19,7 @@ const router = express.Router();
  * tags:
  *   name: Tickets
  *   description: Operations Related To Tickets.
-*/
+ */
 
 /**
  * @swagger
@@ -59,9 +67,9 @@ router.post("/", auth, async (req: CustomRequest, res: Response) => {
       expiry: req.body.expiry,
     };
     const newTicket = await createTicket(ticket);
-    return res.status(201).send({ ticket: newTicket });
-  } catch(error: any) {
-    return res.status(400).send({ error: error.message });
+    return res.status(201).send(createResponse(201, "TICKET_CREATED", newTicket));
+  } catch (error: any) {
+    return res.status(400).send(createErrorResponse(400, "BAD_REQUEST", error.message));
   }
 });
 
@@ -74,19 +82,19 @@ router.post("/", auth, async (req: CustomRequest, res: Response) => {
  *     tags: [Tickets]
  *     security:
  *       - bearerAuth: []
- *     parameters:  
+ *     parameters:
  *       - in: query
  *         name: limit
  *         schema:
  *           type: number
- *           description: The number of tickets to return 
+ *           description: The number of tickets to return
  *           example: 10
- *       - in: query 
+ *       - in: query
  *         name: page
  *         schema:
  *           type: number
  *           description: The page number
- *           example: 1  
+ *           example: 1
  *     responses:
  *       200:
  *         description: Returns all tickets
@@ -95,10 +103,80 @@ router.get("/open", auth, async (req: Request, res: Response) => {
   try {
     const { limit, page } = req.query;
     const tickets = await getOpenTickets(Number(limit), Number(page));
-    return res.status(200).send(createResponse(200, "TICKETS_FETCHED", tickets));
+    return res
+      .status(200)
+      .send(createResponse(200, "TICKETS_FETCHED", tickets));
   } catch (error: any) {
-    return res.status(400).send(createErrorResponse(400, "BAD_REQUEST", error.message));
+    return res
+      .status(400)
+      .send(createErrorResponse(400, "BAD_REQUEST", error.message));
   }
-})
+});
+
+/**
+ * @swagger
+ * /api/tickets/{id}:
+ *   delete:
+ *     summary: Delete ticket
+ *     description: Delete ticket
+ *     tags: [Tickets]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           description: Ticket ID
+ *           example: 60f3b3b3b3b3b3b3b3b3b3b
+ *     responses:
+ *       200:
+ *         description: Returns message
+ */
+router.delete("/:id", auth, async (req: CustomRequest, res: Response) => {
+  try {
+    const ticketId = req.params.id;
+    const ticket = await deleteTicket(ticketId);
+    return res.status(200).send(createResponse(200, "TICKET_DELETED", ticket));
+  } catch (error: any) {
+    return res
+      .status(400)
+      .send(createErrorResponse(400, "BAD_REQUEST", error.message));
+  }
+});
+
+/**
+ * @swagger
+ * /api/tickets/{id}:
+ *   get:
+ *     summary: Get ticket by ID
+ *     description: Get ticket by ID
+ *     tags: [Tickets]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           description: Ticket ID
+ *           example: 60f3b3b3b3b3b3b3b3b3b3b
+ *     responses:
+ *       200:
+ *         description: Returns ticket
+ */
+router.get("/:id", auth, async (req: CustomRequest, res: Response) => {
+  try {
+    const ticketId = req.params.id;
+    const ticket = await getTicketById(ticketId);
+    return res.status(200).send(createResponse(200, "TICKET_FETCHED", ticket));
+  } catch (error: any) {
+    return res
+      .status(400)
+      .send(createErrorResponse(400, "BAD_REQUEST", error.message));
+  }
+});
 
 export default router;

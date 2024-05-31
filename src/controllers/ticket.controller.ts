@@ -5,9 +5,7 @@ import User, { IUser } from "../models/user.model";
 export const createTicket = async (ticket: Partial<ITicket>) => {
     const { title, price, owner, expiry } = ticket;
     if(!title || !price || !expiry) {
-        return {
-            error: 'Please provide all required fields',
-        }
+        throw new Error('Please provide all required fields');
     }
     const status = 'open';
     const createdAt = new Date();
@@ -16,28 +14,10 @@ export const createTicket = async (ticket: Partial<ITicket>) => {
     return newTicket.toJSON();
 }
 
-export const updateTicket = async (ticket: Partial<ITicket>) => {
-    const { title, price, owner, expiry } = ticket;
-    if(!title || !price || !owner || !expiry) {
-        return {
-            error: 'Please provide all required fields',
-        }
-    }
-    const updatedTicket = await Ticket.findOneAndUpdate({ title }, ticket, { new: true });
-    if(!updatedTicket) {
-        return {
-            error: 'Ticket not found',
-        }
-    }
-    return { ticket: updatedTicket };
-}
-
 export const deleteTicket = async (id: string) => {
     const ticket = await Ticket.findByIdAndDelete(id);
     if(!ticket) {
-        return {
-            error: 'Ticket not found',
-        }
+        throw new Error('Ticket not found');
     }
     return { ticket };
 }
@@ -53,9 +33,7 @@ export const getOpenTickets = async (limit: number, page: number) => {
 export const getTicketById = async (id: string) => {
     const ticket = await Ticket.findById(id);
     if(!ticket) {
-        return {
-            error: 'Ticket not found',
-        }
+        throw new Error('Ticket not found');
     }
     return { ticket };
 }
@@ -64,12 +42,11 @@ export const buyTicket = async (ticketId: string, buyerId: string) => {
     const ticket: ITicket | null = await Ticket.findById(ticketId);
     const buyer: IUser | null = await User.findById(buyerId);
     if(!ticket) {
-        return {
-            error: 'Ticket not found',
-        }
+        throw new Error('Ticket not found');
     }
     ticket.buyer = buyer;
     ticket.status = 'sold';
     await ticket.save();
     return ticket.toJSON();
 }
+``
