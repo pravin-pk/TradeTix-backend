@@ -7,6 +7,8 @@ import cors from 'cors';
 // Routes
 import userRouter from './routers/user.router';
 
+require('dotenv').config()
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -15,7 +17,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // MongoDB Connection
-mongoose.connect('mongodb://localhost:27017/tradeTix-DB')
+mongoose.connect('mongodb://tradetix-mongodb-service:27017/tradeTix-DB')
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Error connecting to MongoDB', err));
 
