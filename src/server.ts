@@ -5,6 +5,7 @@ import { setupSwagger } from './configs/swagger.config';
 
 // Routes
 import userRouter from './routers/user.router';
+import ticketRouter from './routers/ticket.router';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -25,6 +26,7 @@ app.get('/api/ping', (req, res) => {
 });
 
 app.use('/api/users', userRouter);
+app.use('/api/tickets', ticketRouter);
 
 
 app.listen(PORT, () => {
