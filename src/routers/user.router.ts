@@ -102,7 +102,7 @@ router.post('/login', async (req: Request, res: Response) => {
  *       200:
  *         description: User logged out successfully
  */
-router.post('/logout', auth, async (req: CustomRequest, res: Response) => {
+router.post('/logout', auth(), async (req: CustomRequest, res: Response) => {
     try {
         if(req.user) {
             req.user.tokens = req.user.tokens.filter((token) => {
@@ -129,7 +129,7 @@ router.post('/logout', auth, async (req: CustomRequest, res: Response) => {
  *       200:
  *         description: Returns user profile
  */
-router.get('/me', auth, async (req: CustomRequest, res: Response) => {
+router.get('/me', auth(), async (req: CustomRequest, res: Response) => {
     try {
         const userId = req.user!._id;
         const user = await getUserById(userId as string);
@@ -180,7 +180,7 @@ router.get('/me', auth, async (req: CustomRequest, res: Response) => {
  *       500:
  *         description: Internal server error
  */
-router.post('/:userId/bank-details', auth, async (req: CustomRequest, res: Response) => {
+router.post('/:userId/bank-details', auth(), async (req: CustomRequest, res: Response) => {
     try {
         const userId = req.params.userId;
         const accountNumber = req.body.accountNumber;

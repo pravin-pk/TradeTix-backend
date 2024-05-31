@@ -24,10 +24,7 @@ export const deleteTicket = async (id: string) => {
 }
 
 export const getOpenTickets = async (limit: number, page: number) => {
-    const tickets = await Ticket.find({status: 'open' }).sort({createdAt: -1}).limit(limit).skip(limit * (page - 1));
-    if (!tickets.length) {
-        throw HttpError.notFound("Ticket", "No open tickets found");
-    }   
+    const tickets = await Ticket.find({status: 'open' }).sort({createdAt: -1}).limit(limit).skip(limit * (page - 1)); 
     return tickets;
 };
 
