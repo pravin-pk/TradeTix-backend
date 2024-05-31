@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 
 export interface IUser extends Document{
     username: string;
+    name: string;
     email: string;
     password: string;
     tokens: { token: string}[];

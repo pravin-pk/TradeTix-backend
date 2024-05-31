@@ -41,6 +41,7 @@ const router = express.Router();
 router.post('/register', async (req: Request, res: Response) => {
     const user: Partial<IUser> = {
         username: req.body.username,
+        name: req.body.name,
         email: req.body.email,
         password: req.body.password
     }
