@@ -3,6 +3,7 @@ import { IUser } from '../models/user.model';
 import { loginUser, registerUser, addBankDetails, getUserById } from '../controllers/user.controller';
 import auth, { CustomRequest } from '../middlewares/auth.middleware';
 import { Request, Response } from 'express';
+import { createErrorResponse, createResponse } from '../utils/responseHandler.util';
 
 const router = express.Router();
 
@@ -39,17 +40,17 @@ const router = express.Router();
  *         description: Error occurred
  */
 router.post('/register', async (req: Request, res: Response) => {
-    const user: Partial<IUser> = {
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password
+    try{
+        const user: Partial<IUser> = {
+            username: req.body.username,
+            email: req.body.email,
+            password: req.body.password
+        }
+        const registeredUser = await registerUser(user);
+        return res.status(201).send(createResponse(201, "USER_REGISTERED", registeredUser));
+    } catch (error: any) {
+        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.message));
     }
-    const registeredUser = await registerUser(user);
-    if (registeredUser.error) {
-        return res.status(400).send({ error: registeredUser.error });
-    }
-
-    return res.status(201).send({registeredUser});
 });
 
 /**
@@ -82,13 +83,11 @@ router.post('/login', async (req: Request, res: Response) => {
             password: req.body.password
         }
         const loggedInUser = await loginUser(user);
-        return res.send({ loggedInUser });
+        return res.send(createResponse(200, "USER_LOGGED_IN", loggedInUser));
     } catch(error: any) {
-        return res.status(400).send({ error: error.message });
+        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.message));
     }
 })
-
-
 
 /**
  * @swagger
@@ -104,14 +103,17 @@ router.post('/login', async (req: Request, res: Response) => {
  *         description: User logged out successfully
  */
 router.post('/logout', auth, async (req: CustomRequest, res: Response) => {
-    if(req.user) {
-        req.user.tokens = req.user.tokens.filter((token) => {
-            return token.token !== req.token;
-        })
-        await req.user.save();
+    try {
+        if(req.user) {
+            req.user.tokens = req.user.tokens.filter((token) => {
+                return token.token !== req.token;
+            })
+            await req.user.save();
+        }
+        return res.status(200).json(createResponse(200, "USER_LOGGED_OUT", "Logged out"));
+    } catch(error: any) {
+        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.message));
     }
-
-    return res.status(200).json({ message: 'Logged out' });
 });
 
 /**
@@ -131,9 +133,9 @@ router.get('/me', auth, async (req: CustomRequest, res: Response) => {
     try {
         const userId = req.user!._id;
         const user = await getUserById(userId as string);
-        return res.send({ user });
+        return res.status(200).send(createResponse(200, "USER_FETCHED", user));
     } catch(error: any) {
-        return res.status(500).send({ error: error.message });
+        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.message));
     }
 });
 
@@ -184,9 +186,9 @@ router.post('/:userId/bank-details', auth, async (req: CustomRequest, res: Respo
         const accountNumber = req.body.accountNumber;
         const IFSCCode = req.body.IFSCCode;
         const updatedUser = await addBankDetails(userId, accountNumber, IFSCCode);
-        return res.send({ user: updatedUser });
+        return res.status(200).send(createResponse(200, "BANK_DETAILS_ADDED", updatedUser));
     } catch(error: any) {
-        return res.status(400).send({ error: error.message });
+        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.message));
     }
 })
 
