@@ -57,7 +57,7 @@ const router = express.Router();
  *       200:
  *         description: Returns all tickets
  */
-router.post("/", auth, async (req: CustomRequest, res: Response) => {
+router.post("/", auth(), async (req: CustomRequest, res: Response) => {
   try {
     const ticket = {
       title: req.body.title,
@@ -67,9 +67,13 @@ router.post("/", auth, async (req: CustomRequest, res: Response) => {
       expiry: req.body.expiry,
     };
     const newTicket = await createTicket(ticket);
-    return res.status(201).send(createResponse(201, "TICKET_CREATED", newTicket));
+    return res
+      .status(201)
+      .send(createResponse(201, "TICKET_CREATED", newTicket));
   } catch (error: any) {
-    return res.status(400).send(createErrorResponse(400, "BAD_REQUEST", error.message));
+    return res
+      .status(error.status)
+      .send(createErrorResponse(error.status, error.message, error.message));
   }
 });
 
@@ -99,7 +103,7 @@ router.post("/", auth, async (req: CustomRequest, res: Response) => {
  *       200:
  *         description: Returns all tickets
  */
-router.get("/open", auth, async (req: Request, res: Response) => {
+router.get("/open", auth(), async (req: Request, res: Response) => {
   try {
     const { limit, page } = req.query;
     const tickets = await getOpenTickets(Number(limit), Number(page));
@@ -108,8 +112,8 @@ router.get("/open", auth, async (req: Request, res: Response) => {
       .send(createResponse(200, "TICKETS_FETCHED", tickets));
   } catch (error: any) {
     return res
-      .status(400)
-      .send(createErrorResponse(400, "BAD_REQUEST", error.message));
+      .status(error.status)
+      .send(createErrorResponse(error.status, error.message, error.message));
   }
 });
 
@@ -134,15 +138,15 @@ router.get("/open", auth, async (req: Request, res: Response) => {
  *       200:
  *         description: Returns message
  */
-router.delete("/:id", auth, async (req: CustomRequest, res: Response) => {
+router.delete("/:id", auth(), async (req: CustomRequest, res: Response) => {
   try {
     const ticketId = req.params.id;
     const ticket = await deleteTicket(ticketId);
     return res.status(200).send(createResponse(200, "TICKET_DELETED", ticket));
   } catch (error: any) {
     return res
-      .status(400)
-      .send(createErrorResponse(400, "BAD_REQUEST", error.message));
+      .status(error.status)
+      .send(createErrorResponse(error.status, error.message, error.message));
   }
 });
 
@@ -167,15 +171,15 @@ router.delete("/:id", auth, async (req: CustomRequest, res: Response) => {
  *       200:
  *         description: Returns ticket
  */
-router.get("/:id", auth, async (req: CustomRequest, res: Response) => {
+router.get("/:id", auth(), async (req: CustomRequest, res: Response) => {
   try {
     const ticketId = req.params.id;
     const ticket = await getTicketById(ticketId);
     return res.status(200).send(createResponse(200, "TICKET_FETCHED", ticket));
   } catch (error: any) {
     return res
-      .status(400)
-      .send(createErrorResponse(400, "BAD_REQUEST", error.message));
+      .status(error.status)
+      .send(createErrorResponse(error.status, error.message, error.message));
   }
 });
 
