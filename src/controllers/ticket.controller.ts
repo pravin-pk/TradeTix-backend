@@ -13,7 +13,7 @@ export const createTicket = async (ticket: Partial<ITicket>) => {
     const createdAt = new Date();
     const newTicket = new Ticket({title, price, status, owner, createdAt, expiry});
     await newTicket.save();
-    return { title: newTicket.title, price: newTicket.price, status: newTicket.status, owner: newTicket.owner._id, createdAt: newTicket.createdAt, updatedAt: newTicket.updatedAt, expiry: newTicket.expiry };
+    return newTicket.toJSON();
 }
 
 export const updateTicket = async (ticket: Partial<ITicket>) => {
@@ -71,5 +71,5 @@ export const buyTicket = async (ticketId: string, buyerId: string) => {
     ticket.buyer = buyer;
     ticket.status = 'sold';
     await ticket.save();
-    return { ticket };
+    return ticket.toJSON();
 }

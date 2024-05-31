@@ -68,6 +68,15 @@ ticketSchema.pre<ITicket>('findOneAndUpdate', function(next) {
 ticketSchema.methods.toJSON = function() {
     const ticket = this as ITicket;
     const ticketObject = ticket.toObject();
+
+    delete ticketObject.owner.tokens;
+    delete ticketObject.owner.password;
+
+    if(ticket.buyer) {
+        delete ticketObject.buyer.tokens;
+        delete ticketObject.buyer.password;
+    }
+    
     return ticketObject;
 }
 

@@ -34,3 +34,25 @@ export const loginUser = async (user: Partial<IUser>) => {
     const token = await existingUser.generateAuthToken();
     return { user: existingUser, token };
 }
+
+export const addBankDetails = async (userId: string, accountNumber: string, IFSCCode: string) => {
+    if (!accountNumber || !IFSCCode) {
+        throw new Error('Please provide all required fields');
+    }
+    const updatedUser = await User.findOneAndUpdate({ _id: userId }, { accountNumber, IFSCCode }, { new: true });
+    if (!updatedUser) {
+        throw new Error('User not found');
+    }
+    return updatedUser;
+}
+
+export const getUserById = async (userId: string) => {
+    if (!userId) {
+        throw new Error('Please provide user ID');
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new Error('User not found');
+    }
+    return user.toJSON();
+}

@@ -8,17 +8,15 @@ import cors from 'cors';
 import userRouter from './routers/user.router';
 import ticketRouter from './routers/ticket.router';
 
-require('dotenv').config()
-
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(bodyParser.json());
 app.use(cors());
 
 // MongoDB Connection
-mongoose.connect('mongodb://tradetix-mongodb-service:27017/tradeTix-DB')
+mongoose.connect(process.env.MONGO_URI as string)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Error connecting to MongoDB', err));
 

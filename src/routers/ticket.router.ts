@@ -1,18 +1,12 @@
 import express from "express";
-import { Request as ExpressRequest, Response } from "express";
-// import Request from "../interfaces/request.interface";
-import { createTicket, updateTicket, deleteTicket, getOpenTickets } from "../controllers/ticket.controller";
-import auth from "../middlewares/auth.middleware";
-import { IUser } from "../models/user.model";
+import { Request , Response } from "express";
+import { createTicket, deleteTicket, getOpenTickets } from "../controllers/ticket.controller";
+import auth, { CustomRequest } from "../middlewares/auth.middleware";
 import { createErrorResponse, createResponse } from "../utils/responseHandler.util";
 
 const router = express.Router();
 
-// export interface Request extends ExpressRequest {
-//   user: IUser
-// }
-
-/*
+/**
  * @swagger
  * tags:
  *   name: Tickets
@@ -55,7 +49,7 @@ const router = express.Router();
  *       200:
  *         description: Returns all tickets
  */
-router.post("/", auth, async (req: any, res: Response) => {
+router.post("/", auth, async (req: CustomRequest, res: Response) => {
   try {
     const ticket = {
       title: req.body.title,
@@ -78,6 +72,8 @@ router.post("/", auth, async (req: any, res: Response) => {
  *     summary: Get open tickets
  *     description: Get open tickets
  *     tags: [Tickets]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:  
  *       - in: query
  *         name: limit
@@ -95,7 +91,7 @@ router.post("/", auth, async (req: any, res: Response) => {
  *       200:
  *         description: Returns all tickets
  */
-router.get("/open", async (req: ExpressRequest, res: Response) => {
+router.get("/open", auth, async (req: Request, res: Response) => {
   try {
     const { limit, page } = req.query;
     const tickets = await getOpenTickets(Number(limit), Number(page));

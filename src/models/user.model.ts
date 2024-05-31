@@ -4,10 +4,11 @@ import jwt from 'jsonwebtoken';
 
 export interface IUser extends Document{
     username: string;
-    name: string;
     email: string;
     password: string;
     tokens: { token: string}[];
+    accountNumber: string
+    IFSCCode: string
     createdAt: Date;
     updatedAt: Date;
 }
@@ -43,7 +44,15 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
             type: String,
             required: true
         }
-    }]
+    }],
+    accountNumber: {
+        type: String,
+        trim: true
+    },
+    IFSCCode: {
+        type: String,
+        trim: true
+    }
 }, {
     timestamps: true
 });
