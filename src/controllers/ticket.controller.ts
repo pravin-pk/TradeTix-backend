@@ -4,13 +4,13 @@ import User, { IUser } from "../models/user.model";
 import { HttpError } from "../utils/customExceptionHandler.util";
 
 export const createTicket = async (ticket: Partial<ITicket>) => {
-    const { title, price, owner, expiry } = ticket;
+    const { title, description, price, owner, expiry } = ticket;
     if(!title || !price || !expiry) {
         throw HttpError.badRequest("Ticket", "Please provide all required fields");
     }
     const status = 'open';
     const createdAt = new Date();
-    const newTicket = new Ticket({title, price, status, owner, createdAt, expiry});
+    const newTicket = new Ticket({title, description, price, status, owner, createdAt, expiry});
     await newTicket.save();
     return newTicket.toJSON();
 }
