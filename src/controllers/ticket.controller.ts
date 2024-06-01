@@ -44,8 +44,8 @@ export const getOpenTickets = async (limit: number, page: number) => {
   return tickets.map((ticket) => ticket.toJSON('user'));
 };
 
-export const getTicketsByUser = async (userId: string, idType: 'ownerId' | 'buyerId', limit: number = 10, page: number = 1) => {
-    const tickets = await Ticket.find({[idType]: userId }).sort({ createdAt: -1 }).limit(limit).skip(limit * (page - 1));
+export const getTicketsByUser = async (user: IUser, userType: 'owner' | 'buyer', limit: number = 10, page: number = 1) => {
+    const tickets = await Ticket.find({[userType]: user }).sort({ createdAt: -1 }).limit(limit).skip(limit * (page - 1));
     if(!tickets) {
         throw HttpError.notFound("Ticket", "Ticket not found");
     }
