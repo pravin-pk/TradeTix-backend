@@ -13,6 +13,7 @@ import {
   createErrorResponse,
   createResponse,
 } from "../utils/responseHandler.util";
+import { IUser } from "../models/user.model";
 
 const router = express.Router();
 
@@ -130,7 +131,7 @@ router.get("/open", auth(), async (req: Request, res: Response) => {
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
- *         name: user
+ *         name: userType
  *         schema:
  *           type: string
  *           description: The type of user
@@ -153,10 +154,10 @@ router.get("/open", auth(), async (req: Request, res: Response) => {
  */
 router.get("/me", auth(), async (req: CustomRequest, res: Response) => {
   try {
-    const { user, limit, page } = req.query;
+    const { userType, limit, page } = req.query;
     const tickets = await getTicketsByUser(
-      req.user!._id as string,
-      user === "owner" ? "ownerId" : "buyerId",
+      req.user as IUser,
+      userType as "owner" | "buyer",
       Number(limit),
       Number(page)
     );
