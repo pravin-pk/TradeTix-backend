@@ -14,7 +14,10 @@ export interface ITicket extends Document {
 }
 
 export interface ITicketMethods {
-    toJSON(): ITicket;
+    toJSON(user: 'owner' | 'buyer'): ITicket;
+}
+
+interface TicketModel extends Model<ITicket, {}, ITicketMethods> {
 }
 
 const ticketSchema = new Schema<ITicket, ITicketMethods>({
@@ -65,21 +68,23 @@ ticketSchema.pre<ITicket>('findOneAndUpdate', function(next) {
     next();
 });
 
-ticketSchema.methods.toJSON = function() {
+ticketSchema.methods.toJSON = function(user: 'owner' | 'buyer') {
     const ticket = this as ITicket;
     const ticketObject = ticket.toObject();
 
-    delete ticketObject.owner.tokens;
-    delete ticketObject.owner.password;
-
-    if(ticket.buyer) {
+    if (user === 'owner') {
+        delete ticketObject.owner.tokens;
+        delete ticketObject.owner.password;
+        delete ticketObject.buyer;
+    }else if (user === 'buyer') {
         delete ticketObject.buyer.tokens;
         delete ticketObject.buyer.password;
+        delete ticketObject.owner;
     }
     
     return ticketObject;
 }
 
-const Ticket = model<ITicket>('Ticket', ticketSchema);
+const Ticket = model<ITicket, TicketModel>('Ticket', ticketSchema);
 
 export default Ticket;
