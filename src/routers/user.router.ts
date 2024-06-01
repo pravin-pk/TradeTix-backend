@@ -49,7 +49,7 @@ router.post('/register', async (req: Request, res: Response) => {
         const registeredUser = await registerUser(user);
         return res.status(201).send(createResponse(201, "USER_REGISTERED", registeredUser));
     } catch (error: any) {
-        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.message));
+        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.error));
     }
 });
 
@@ -85,7 +85,7 @@ router.post('/login', async (req: Request, res: Response) => {
         const loggedInUser = await loginUser(user);
         return res.send(createResponse(200, "USER_LOGGED_IN", loggedInUser));
     } catch(error: any) {
-        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.message));
+        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.error));
     }
 })
 
@@ -112,7 +112,7 @@ router.post('/logout', auth(), async (req: CustomRequest, res: Response) => {
         }
         return res.status(200).json(createResponse(200, "USER_LOGGED_OUT", "Logged out"));
     } catch(error: any) {
-        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.message));
+        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.error));
     }
 });
 
@@ -135,7 +135,7 @@ router.get('/me', auth(), async (req: CustomRequest, res: Response) => {
         const user = await getUserById(userId as string);
         return res.status(200).send(createResponse(200, "USER_FETCHED", user));
     } catch(error: any) {
-        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.message));
+        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.error));
     }
 });
 
@@ -188,7 +188,7 @@ router.post('/:userId/bank-details', auth(), async (req: CustomRequest, res: Res
         const updatedUser = await addBankDetails(userId, accountNumber, IFSCCode);
         return res.status(200).send(createResponse(200, "BANK_DETAILS_ADDED", updatedUser));
     } catch(error: any) {
-        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.message));
+        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.error));
     }
 })
 

@@ -4,7 +4,9 @@ import {
   createTicket,
   deleteTicket,
   getOpenTickets,
+  getTicketsByUser,
   getTicketById,
+  buyTicket,
 } from "../controllers/ticket.controller";
 import auth, { CustomRequest } from "../middlewares/auth.middleware";
 import {
@@ -55,7 +57,7 @@ const router = express.Router();
  *                example: "2022-12-31T00:00:00.000Z"
  *     responses:
  *       200:
- *         description: Returns all tickets
+ *         description: Creates new ticket
  */
 router.post("/", auth(), async (req: CustomRequest, res: Response) => {
   try {
@@ -73,7 +75,7 @@ router.post("/", auth(), async (req: CustomRequest, res: Response) => {
   } catch (error: any) {
     return res
       .status(error.status)
-      .send(createErrorResponse(error.status, error.message, error.message));
+      .send(createErrorResponse(error.status, error.message, error.error));
   }
 });
 
@@ -113,7 +115,58 @@ router.get("/open", auth(), async (req: Request, res: Response) => {
   } catch (error: any) {
     return res
       .status(error.status)
-      .send(createErrorResponse(error.status, error.message, error.message));
+      .send(createErrorResponse(error.status, error.message, error.error));
+  }
+});
+
+/**
+ * @swagger
+ * /api/tickets/me:
+ *   get:
+ *     summary: Get my tickets
+ *     description: Get my tickets
+ *     tags: [Tickets]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: user
+ *         schema:
+ *           type: string
+ *           description: The type of user
+ *           example: owner
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *           description: The number of tickets to return
+ *           example: 10
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: number
+ *           description: The page number
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Returns all tickets
+ */
+router.get("/me", auth(), async (req: CustomRequest, res: Response) => {
+  try {
+    const { user, limit, page } = req.query;
+    const tickets = await getTicketsByUser(
+      req.user!._id as string,
+      user === "owner" ? "ownerId" : "buyerId",
+      Number(limit),
+      Number(page)
+    );
+    return res
+      .status(200)
+      .send(createResponse(200, "TICKETS_FETCHED", tickets));
+  } catch (error: any) {
+    return res
+      .status(error.status)
+      .send(createErrorResponse(error.status, error.message, error.error));
   }
 });
 
@@ -146,7 +199,7 @@ router.delete("/:id", auth(), async (req: CustomRequest, res: Response) => {
   } catch (error: any) {
     return res
       .status(error.status)
-      .send(createErrorResponse(error.status, error.message, error.message));
+      .send(createErrorResponse(error.status, error.message, error.error));
   }
 });
 
@@ -179,7 +232,40 @@ router.get("/:id", auth(), async (req: CustomRequest, res: Response) => {
   } catch (error: any) {
     return res
       .status(error.status)
-      .send(createErrorResponse(error.status, error.message, error.message));
+      .send(createErrorResponse(error.status, error.message, error.error));
+  }
+});
+
+/**
+ * @swagger
+ * /api/tickets/{id}/buy:
+ *   patch:
+ *     summary: Buy ticket
+ *     description: Buy ticket
+ *     tags: [Tickets]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           description: Ticket ID
+ *           example: 60f3b3b3b3b3b3b3b3b3b3b
+ *     responses:
+ *       200:
+ *         description: Returns ticket
+ */
+router.patch("/:id/buy", auth(), async (req: CustomRequest, res: Response) => {
+  try {
+    const ticketId = req.params.id;
+    const ticket = await buyTicket(ticketId, req.user!._id as string);
+    return res.status(200).send(createResponse(200, "TICKET_BOUGHT", ticket));
+  } catch (error: any) {
+    return res
+      .status(error.status)
+      .send(createErrorResponse(error.status, error.message, error.error));
   }
 });
 
