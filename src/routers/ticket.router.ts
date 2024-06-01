@@ -4,8 +4,9 @@ import {
   createTicket,
   deleteTicket,
   getOpenTickets,
+  getTicketsByUser,
   getTicketById,
-  buyTicket
+  buyTicket,
 } from "../controllers/ticket.controller";
 import auth, { CustomRequest } from "../middlewares/auth.middleware";
 import {
@@ -120,6 +121,57 @@ router.get("/open", auth(), async (req: Request, res: Response) => {
 
 /**
  * @swagger
+ * /api/tickets/me:
+ *   get:
+ *     summary: Get my tickets
+ *     description: Get my tickets
+ *     tags: [Tickets]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: user
+ *         schema:
+ *           type: string
+ *           description: The type of user
+ *           example: owner
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *           description: The number of tickets to return
+ *           example: 10
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: number
+ *           description: The page number
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Returns all tickets
+ */
+router.get("/me", auth(), async (req: CustomRequest, res: Response) => {
+  try {
+    const { user, limit, page } = req.query;
+    const tickets = await getTicketsByUser(
+      req.user!._id as string,
+      user === "owner" ? "ownerId" : "buyerId",
+      Number(limit),
+      Number(page)
+    );
+    return res
+      .status(200)
+      .send(createResponse(200, "TICKETS_FETCHED", tickets));
+  } catch (error: any) {
+    return res
+      .status(error.status)
+      .send(createErrorResponse(error.status, error.message, error.error));
+  }
+});
+
+/**
+ * @swagger
  * /api/tickets/{id}:
  *   delete:
  *     summary: Delete ticket
@@ -215,6 +267,6 @@ router.patch("/:id/buy", auth(), async (req: CustomRequest, res: Response) => {
       .status(error.status)
       .send(createErrorResponse(error.status, error.message, error.error));
   }
-})
+});
 
 export default router;
