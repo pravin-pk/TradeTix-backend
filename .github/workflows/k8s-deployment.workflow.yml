@@ -16,9 +16,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions-hub/kubectl@master
-        env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
-        with:
-          args: kubectl get pods
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup kubectl
+        run: |
+          mkdir ${HOME}/.kube
+          echo ${{ secrets.KUBE_CONFIG }} | base64 -d > ${HOME}/.kube/config
+          cat ${HOME}/.kube/config
+
+      - name: Setup context
+        run: |
+          kubectl config set-context --current --namespace=prod
+          kubectl get pods
