@@ -1,16 +1,9 @@
 name: TradeTix CD Pipeline
 
 on:
-#   workflow_run:
-#     workflows:
-#       - "TradeTix CI Pipeline"
-#     types:
-#       - "completed"
-#     branches:
-#         - "main"
-    push:
-        branches:
-        - main
+  push:
+      branches:
+      branches: [ main , canary, dev, feature/*]
 
 jobs:
   push_to_registry:
