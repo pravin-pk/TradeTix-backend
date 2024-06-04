@@ -2,8 +2,11 @@ name: TradeTix CD Pipeline
 
 on:
   push:
-      branches:
-      branches: [ main , canary, dev, feature/*]
+    branches:
+      - 'main'
+      - 'canary'
+      - 'dev'
+      - 'feature/**'
 
 jobs:
   push_to_registry:
