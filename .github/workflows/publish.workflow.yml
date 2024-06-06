@@ -82,8 +82,6 @@ jobs:
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: pravinkumar08654/tradetix
-          tags: canary
-          
 
       - name: Build and push Docker image
         id: push
@@ -92,12 +90,14 @@ jobs:
           context: .
           file: ./k8s/Dockerfile
           push: true
+          tags: canary
+          labels: ${{ steps.meta.outputs.labels }}
 
       - name: Workflow Webhook Action
         uses: distributhor/workflow-webhook@v3.0.7
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
-          data: '{ "message": "Image pushed to Docker Hub with Canary Tag", }'
+          data: '{ "message": "Image pushed to Docker Hub with Canary Tag", "tag": "canary" }'
 
   prod:
     if: github.event.inputs.releaseTo == 'prod'
@@ -120,8 +120,6 @@ jobs:
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: pravinkumar08654/tradetix
-          tags: prod
-          
 
       - name: Build and push Docker image
         id: push
@@ -130,12 +128,14 @@ jobs:
           context: .
           file: ./k8s/Dockerfile
           push: true
+          tags: prod
+          labels: ${{ steps.meta.outputs.labels }}
 
       - name: Workflow Webhook Action
         uses: distributhor/workflow-webhook@v3.0.7
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
-          data: '{ "message": "Image pushed to Docker Hub with Prod Tag", }'
+          data: '{ "message": "Image pushed to Docker Hub with Prod Tag", "tag": "prod" }'
 
 
             
