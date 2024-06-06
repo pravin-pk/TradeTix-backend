@@ -1,12 +1,12 @@
-name: Publishing Image
+name: Staging
 
 on:
   push:
     branches:
       - 'main'
       - 'canary'
-      - 'dev'
-      - 'feature/**'
+  pull_request:
+    branches: [ 'main' ]
   workflow_dispatch:
     inputs: 
       releaseTo:
@@ -14,13 +14,12 @@ on:
         required: false
         default: 'dev'
         options:
-        - 'dev'
         - 'canary'
         - 'prod'
 
 jobs:
   push_to_registry:
-    name: Publishing to Docker Hub
+    name: Staging
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -63,7 +62,7 @@ jobs:
 
   canary:
     if: github.event.inputs.releaseTo == 'canary'
-    name: Deploy to Canary
+    name: Publish to Canary
     needs: [push_to_registry]
 
     runs-on: ubuntu-latest
@@ -101,7 +100,7 @@ jobs:
 
   prod:
     if: github.event.inputs.releaseTo == 'prod'
-    name: Deploy to Prod
+    name: Publish to Prod
     needs: [push_to_registry]
 
     runs-on: ubuntu-latest
