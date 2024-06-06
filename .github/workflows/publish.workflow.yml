@@ -44,10 +44,10 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Workflow Webhook Action
-          uses: distributhor/workflow-webhook@v3.0.7
-          with:
-            webhook_url: ${{ secrets.WEBHOOK_URL }}
-            status: ${{ job.status }}
-            job_name: ${{ job.name }}
+        uses: distributhor/workflow-webhook@v3.0.7
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          status: ${{ job.status }}
+          job_name: ${{ job.name }}
             
       
