@@ -10,7 +10,7 @@ on:
 
 jobs:
   push_to_registry:
-    name: Push Docker image to Docker Hub
+    name: Publishing to Docker Hub
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -47,7 +47,7 @@ jobs:
         uses: distributhor/workflow-webhook@v3.0.7
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
-          status: ${{ job.status }}
-          job_name: ${{ job.name }}
+          data: '{status: ${{ job.status }}, job_name: ${{ job.name }}}'
+
             
       
