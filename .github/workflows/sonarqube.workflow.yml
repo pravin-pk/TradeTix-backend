@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Build and analyze
+    name: SonarQube Scan
     runs-on: ubuntu-latest
     
     steps:

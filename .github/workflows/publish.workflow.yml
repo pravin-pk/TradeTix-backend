@@ -6,7 +6,7 @@ on:
       - 'main'
       - 'canary'
   pull_request:
-    branches: [ 'main' ]
+    types: [opened, reopened]
   workflow_dispatch:
     inputs: 
       releaseTo:
