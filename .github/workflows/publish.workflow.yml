@@ -14,9 +14,9 @@ on:
         required: false
         default: 'dev'
         options:
-          - 'dev'
-          - 'canary'
-          - 'prod'
+        - 'dev'
+        - 'canary'
+        - 'prod'
 
 jobs:
   push_to_registry:
@@ -101,7 +101,7 @@ jobs:
 
   prod:
     if: github.event.inputs.releaseTo == 'prod'
-    name: Deploy to Canary
+    name: Deploy to Prod
     needs: [push_to_registry]
 
     runs-on: ubuntu-latest
