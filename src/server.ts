@@ -24,7 +24,7 @@ mongoose.connect(process.env.MONGO_URI as string)
 setupSwagger(app);
 
 app.get('/api/ping', (req, res) => {
-    res.send({ response: 'pong'});
+    res.send({ response: 'pong', system: 'canary'});
 });
 
 app.use('/api/users', userRouter);
