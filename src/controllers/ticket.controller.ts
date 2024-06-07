@@ -38,7 +38,7 @@ export const getOpenTickets = async (limit: number, page: number) => {
     status: "open",
     expiry: { $gte: currentDate },
   })
-    .sort({ createdAt: -1 })
+    .sort({ expiry: 1 })
     .limit(limit)
     .skip(limit * (page - 1));
   return tickets.map((ticket) => ticket.toJSON('user'));
