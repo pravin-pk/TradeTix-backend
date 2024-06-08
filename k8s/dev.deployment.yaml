@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tradetix-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tradetix
+  template:
+    metadata:
+      labels:
+        app: tradetix
+    spec:
+      containers:
+        - name: tradetix-container
+          image: pravinkumar08654/tradetix:dev
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3001
+          env:
+            - name: JWT_SECRET
+              value: ${{ secrets.JWT_SECRET }}
+            - name: MONGO_URI
+              value: "mongodb://tradetix-mongodb-service:27017/tradeTix-DB"
+            - name: PORT
+              value: "3001"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: tradetix-service
+spec:
+  selector:
+    app: tradetix
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3001
+  type: LoadBalancer
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tradetix-mongodb-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tradetix-mongodb
+  template:
+    metadata:
+      labels:
+        app: tradetix-mongodb
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: tradetix-mongodb-container
+          image: mongodb/mongodb-community-server:latest
+          ports:
+            - containerPort: 27017
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: tradetix-mongodb-service
+spec:
+  selector:
+    app: tradetix-mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+  type: ClusterIP
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: istio
+spec:
+  controller: istio.io/ingress-controller
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tradetix-ingress
+spec:
+  ingressClassName: istio
+  rules:
+    - host: ${{ secrets.HOST }}
+      http:
+        paths:
+        - backend:
+            service:
+              name: tradetix-service
+              port:
+                number: 80
+          path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+      - ${{ secrets.HOST }}
+      secretName: kyma-gateway-certs
