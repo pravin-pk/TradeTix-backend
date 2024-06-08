@@ -14,6 +14,9 @@ const swaggerOptions = {
       {
         url: `http://localhost:${process.env.PORT}`,
       },
+      {
+        url: 'http://tradetix.prod.api.c-25bff2c.kyma.ondemand.com',
+      }
     ],
     components: {
       securitySchemes: {
