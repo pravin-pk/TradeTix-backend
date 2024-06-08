@@ -6,6 +6,7 @@ export interface IUser extends Document{
     username: string;
     email: string;
     password: string;
+    role: 'user' | 'admin';
     tokens: { token: string}[];
     accountNumber: string
     IFSCCode: string
@@ -14,7 +15,7 @@ export interface IUser extends Document{
 }
 
 export interface IUserMethods {
-    generateAuthToken(): Promise<string>;
+    generateAuthToken(role: 'user'|'admin'): Promise<string>;
     toJSON(): IUser;
 }
 
@@ -38,6 +39,12 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
         type: String,
         required: true,
         trim: true
+    },
+    role: {
+        type: String,
+        required: true,
+        enum: ['user', 'admin'],
+        default: 'user'
     },
     tokens: [{
         token: {
@@ -63,9 +70,9 @@ userSchema.pre('save', async function(next) {
     }
 });
 
-userSchema.methods.generateAuthToken = async function() {
+userSchema.methods.generateAuthToken = async function(role: 'user' | 'admin' = 'user') {
     const user = this;
-    const token = jwt.sign({ _id: (user._id as string).toString() }, process.env.JWT_SECRET!);
+    const token = jwt.sign({ _id: (user._id as string).toString(), role}, process.env.JWT_SECRET!);
     user.tokens = user.tokens.concat({ token });
     await user.save();
     return token;
@@ -82,11 +89,11 @@ userSchema.methods.toJSON = function() {
 userSchema.statics.findByCredentials = async function(email: string, password: string) {
     const user = await User.findOne({ email });
     if(!user) {
-        return null;
+        throw new Error('User not found');
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if(!isMatch) {
-        return null;
+        throw new Error('Invalid credentials');
     }
     return user;
 }

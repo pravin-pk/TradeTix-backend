@@ -27,6 +27,14 @@ app.get('/api/ping', (req, res) => {
     res.send({ response: 'pong'});
 });
 
+app.get('/api/health', (req, res) => {
+    res.send({ 
+        status: 'UP', 
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString() 
+    });
+});
+
 app.use('/api/users', userRouter);
 app.use('/api/tickets', ticketRouter);
 

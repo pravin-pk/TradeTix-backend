@@ -1,75 +1,76 @@
 import Ticket from "../models/ticket.model";
 import { ITicket } from "../models/ticket.model";
 import User, { IUser } from "../models/user.model";
+import { sendEmail } from "../providers/mailer.provider";
+import { HttpError } from "../utils/customExceptionHandler.util";
 
 export const createTicket = async (ticket: Partial<ITicket>) => {
-    const { title, price, owner, expiry } = ticket;
-    if(!title || !price || !expiry) {
-        return {
-            error: 'Please provide all required fields',
-        }
-    }
-    const status = 'open';
-    const createdAt = new Date();
-    const newTicket = new Ticket({title, price, status, owner, createdAt, expiry});
-    await newTicket.save();
-    return newTicket.toJSON();
-}
-
-export const updateTicket = async (ticket: Partial<ITicket>) => {
-    const { title, price, owner, expiry } = ticket;
-    if(!title || !price || !owner || !expiry) {
-        return {
-            error: 'Please provide all required fields',
-        }
-    }
-    const updatedTicket = await Ticket.findOneAndUpdate({ title }, ticket, { new: true });
-    if(!updatedTicket) {
-        return {
-            error: 'Ticket not found',
-        }
-    }
-    return { ticket: updatedTicket };
-}
-
-export const deleteTicket = async (id: string) => {
-    const ticket = await Ticket.findByIdAndDelete(id);
-    if(!ticket) {
-        return {
-            error: 'Ticket not found',
-        }
-    }
-    return { ticket };
-}
-
-export const getOpenTickets = async (limit: number, page: number) => {
-    const tickets = await Ticket.find({status: 'open' }).sort({createdAt: -1}).limit(limit).skip(limit * (page - 1));
-    if (!tickets.length) {
-        throw new Error('No tickets found');
-    }   
-    return tickets;
+  const { title, description, price, owner, expiry } = ticket;
+  if (!title || !price || !expiry) {
+    throw HttpError.badRequest("Ticket", "Please provide all required fields");
+  }
+  const status = "open";
+  const createdAt = new Date();
+  const newTicket = new Ticket({
+    title,
+    description,
+    price,
+    status,
+    owner,
+    createdAt,
+    expiry,
+  });
+  await newTicket.save();
+  return newTicket.toJSON('owner');
 };
 
-export const getTicketById = async (id: string) => {
-    const ticket = await Ticket.findById(id);
-    if(!ticket) {
-        return {
-            error: 'Ticket not found',
-        }
+export const deleteTicket = async (id: string) => {
+  const ticket = await Ticket.findByIdAndDelete(id);
+  if (!ticket) {
+    throw HttpError.notFound("Ticket", "Ticket not found");
+  }
+  return ticket.toJSON('owner');
+};
+
+export const getOpenTickets = async (limit: number, page: number) => {
+  const currentDate = new Date();
+  const tickets = await Ticket.find({
+    status: "open",
+    expiry: { $gte: currentDate },
+  })
+    .sort({ expiry: 1 })
+    .limit(limit)
+    .skip(limit * (page - 1));
+  return tickets.map((ticket) => ticket.toJSON('user'));
+};
+
+export const getTicketsByUser = async (user: IUser, userType: 'owner' | 'buyer', limit: number = 10, page: number = 1) => {
+    const tickets = await Ticket.find({[userType]: user }).sort({ createdAt: -1 }).limit(limit).skip(limit * (page - 1));
+    if(!tickets) {
+        throw HttpError.notFound("Ticket", "Ticket not found");
     }
-    return { ticket };
+    return tickets;
 }
 
+export const getTicketById = async (id: string) => {
+  const ticket = await Ticket.findById(id);
+  if (!ticket) {
+    throw HttpError.notFound("Ticket", "Ticket not found");
+  }
+  return ticket.toJSON('user');
+};
+
 export const buyTicket = async (ticketId: string, buyerId: string) => {
-    const ticket: ITicket | null = await Ticket.findById(ticketId);
-    const buyer: IUser | null = await User.findById(buyerId);
-    if(!ticket) {
-        return {
-            error: 'Ticket not found',
-        }
-    }
-    ticket.buyer = buyer;
-    ticket.status = 'sold';
-    await ticket.save();
-    return ticket.toJSON();
-}
+  const ticket: ITicket | null = await Ticket.findById(ticketId);
+  const buyer: IUser | null = await User.findById(buyerId);
+  if (!ticket) {
+    throw HttpError.notFound("Ticket", "Ticket not found");
+  }
+  if (ticket.status === "sold") {
+    throw HttpError.badRequest("Ticket", "Ticket already sold");
+  }
+  const updatedTicket = await Ticket.findOneAndUpdate({ _id: ticketId }, { status: 'sold', buyer: buyer }, { new: true });
+
+//   await sendEmail(buyer!.email, 'Ticket purchased', `You have successfully purchased a ticket with title: ${updatedTicket!.title}`)
+  return updatedTicket!.toJSON('buyer');
+};
