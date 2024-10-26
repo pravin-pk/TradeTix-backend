@@ -1,0 +1,29 @@
+services:
+  tradetix-app:
+    container_name: tradetix-app
+    image: pravinkumar08654/tradetix:dev
+    ports:
+      - "3001:3001"
+    environment:
+      - JWT_SECRET=A_SECRET_KEY
+      - MONGO_URI=mongodb://localhost:27017/tradeTix-DB
+      - PORT=3001
+    networks:
+      - tradetix-network
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - db-data:/data/db
+    networks:
+      - tradetix-network
+
+volumes:
+  db-data:
+
+networks:
+  tradetix-network:
+    driver: bridge
