@@ -1,7 +1,7 @@
 services:
   # tradetix-app:
   #   container_name: tradetix-app
-  #   image: pravinkumar08654/tradetix:dev
+  #   image: pravinkumarpk/tradetix:dev
   #   ports:
   #     - "3001:3001"
   #   environment:

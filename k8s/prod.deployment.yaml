@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: tradetix-container
-          image: pravinkumar08654/tradetix:prod
+          image: pravinkumarpk/tradetix:prod
           imagePullPolicy: Always
           ports:
             - containerPort: 3001

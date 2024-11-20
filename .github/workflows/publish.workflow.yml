@@ -1,4 +1,4 @@
-name: Staging to dockerHuB
+name: Staging to GitHub Registry
 
 on:
   push:
