@@ -2,12 +2,14 @@ FROM --platform=linux/amd64 node:20-alpine
 
 WORKDIR /app
 
-COPY package.json ./
-
-RUN npm i
-
 COPY . .
+
+COPY package-lock.json ./package-lock.json
+
+RUN npm ci
+
+RUN npm run build
 
 EXPOSE 3001
 
-CMD ["sh", "-c", "npm run build && npm run start"]
+CMD ["sh", "-c", "npm run start"]
