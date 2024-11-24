@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import { setupSwagger } from './configs/swagger.config';
 import cors from 'cors';
+import morgan from 'morgan'
 
 // Routes
 import userRouter from './routers/user.router';
@@ -14,6 +15,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(bodyParser.json());
 app.use(cors());
+app.use(morgan('combined'))
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI as string)
