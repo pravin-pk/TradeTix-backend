@@ -20,7 +20,7 @@ const auth =
       if (!token) {
         throw HttpError.unauthorized("User", "Please authenticate");
       }
-
+      // Verify token
       const decoded = jwt.verify(
         token,
         process.env.JWT_SECRET!
