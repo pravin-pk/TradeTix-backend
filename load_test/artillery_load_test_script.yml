@@ -1,0 +1,43 @@
+config:
+  target: "http://tradetix.api.add2f90.kyma.ondemand.com"
+  plugins:
+    ensure: {}
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      rampTo: 10
+      name: Warm-up phase
+    - duration: 60
+      arrivalRate: 10
+      rampTo: 20
+      name: Steady increase phase
+    - duration: 30
+      arrivalRate: 20
+      rampTo: 50
+      name: Spike phase
+    - duration: 60
+      arrivalRate: 50
+      name: Sustained high load phase
+  defaults:
+    headers:
+      Content-Type: "application/json"
+      Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzQ1OWNmOTRiMmVmZGM2YjkxMTZjMTEiLCJyb2xlIjoidXNlciIsImlhdCI6MTczMjYxNTQ2OX0.brtzS0FFrcTY-DeKPhgSX9wtAqm6z6ssw5fYPyfGZFU"
+scenarios:
+  - name: Test API Endpoints
+    flow:
+      - get:
+          url: "/api/users/me"
+      - get:
+          url: "/api/tickets/open"
+      - get:
+          url: "/api/tickets/67459e334b2efdc6b9116c2c"
+      - get:
+          url: "/api/tickets/67459e444b2efdc6b9116c31"
+      - get:
+          url: "/api/tickets/67459e774b2efdc6b9116c45"
+      - get:
+          url: "/api/tickets/67459e584b2efdc6b9116c3b"
+      - get:
+          url: "/api/tickets/67459e5f4b2efdc6b9116c40"
+      - get:
+          url: "/api/health"
