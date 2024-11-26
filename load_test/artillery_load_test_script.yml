@@ -21,7 +21,7 @@ config:
   defaults:
     headers:
       Content-Type: "application/json"
-      Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzQ1OWNmOTRiMmVmZGM2YjkxMTZjMTEiLCJyb2xlIjoidXNlciIsImlhdCI6MTczMjYxNTQ2OX0.brtzS0FFrcTY-DeKPhgSX9wtAqm6z6ssw5fYPyfGZFU"
+      Authorization: "Bearer ********************************************************"
 scenarios:
   - name: Test API Endpoints
     flow:
