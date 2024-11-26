@@ -21,7 +21,7 @@ config:
   defaults:
     headers:
       Content-Type: "application/json"
-      Authorization: "Bearer ********************************************************"
+      Authorization: ""               # Here you can enter the Bearer token
 scenarios:
   - name: Test API Endpoints
     flow:
