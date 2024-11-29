@@ -36,7 +36,7 @@ export const updateTicket = async (id: string, ticket: Partial<ITicket>, user: P
       { new: true }
   );
   if (!updatedTicket) {
-      throw new Error("Ticket not found");
+      throw HttpError.notFound("Ticket", "Ticket not found");
   }
   return updatedTicket;
 };
@@ -44,7 +44,7 @@ export const updateTicket = async (id: string, ticket: Partial<ITicket>, user: P
 export const deleteTicket = async (id: string) => {
   const deletedTicket = await Ticket.findOneAndDelete({ _id: id });
   if (!deletedTicket) {
-      throw new Error("Ticket not found");
+      throw HttpError.notFound("Ticket", "Ticket not found");
   }
   return deletedTicket;
 }

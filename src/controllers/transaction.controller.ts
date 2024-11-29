@@ -1,6 +1,7 @@
 import { FilterQuery } from "mongoose";
 import Transaction, { ITransaction } from "../models/transaction.model";
 import { IUser } from "../models/user.model";
+import { HttpError } from "../utils/customExceptionHandler.util";
 
 export const createTransaction = async (
   listingID: string,
@@ -29,7 +30,7 @@ export const getTransactions = async (limit: number, page: number, filter: Filte
 export const getTransactionById = async (id: string) => {
   const transaction = await Transaction.findById(id);
   if (!transaction) {
-    throw new Error("Transaction not found");
+    throw HttpError.notFound("Transaction", "Transaction not found");
   }
   return transaction;
 }

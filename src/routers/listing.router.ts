@@ -8,7 +8,7 @@ import {
   createResponse,
 } from "../utils/responseHandler.util";
 import { IUser } from "../models/user.model";
-import { IEvent } from "../models/event.model";
+
 import { ITicket } from "../models/ticket.model";
 
 const router = express.Router();
@@ -17,9 +17,46 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Listings
- *   description: Operations Related To Tickets.
+ *   description: Operations Related To Listings of the Tickets.
  */
 
+/**
+ * @swagger
+ * /api/v1/listings/{id}:
+ *   put:
+ *     summary: Update the details of listed ticket by ID
+ *     description: Update the details of listed ticket by ID
+ *     tags: [Listings]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Ticket ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               seatNumber:
+ *                 type: string
+ *                 description: Seat number of the ticket
+ *                 example: "A2"
+ *     responses:
+ *       200:
+ *         description: Ticket Updated Successfully
+ *       400:
+ *         description: Invalid Request
+ *       401:
+ *         description: User Unauthorized
+ *       500:
+ *         description: Internal Server Error
+ */
 router.put("/:id", auth(), async (req: CustomRequest, res: Response) => {
   try {
     const id: string = req.params.id;
@@ -38,15 +75,44 @@ router.put("/:id", auth(), async (req: CustomRequest, res: Response) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/listings/{id}:
+ *   delete:
+ *     summary: Delete the listed ticket by ID
+ *     description: Delete the listed ticket by ID
+ *     tags: [Listings]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Ticket ID
+ *     responses:
+ *       200:
+ *         description: Ticket removed Successfully
+ *       400:
+ *         description: Invalid Request
+ *       401:
+ *         description: User Unauthorized
+ *       500:
+ *         description: Internal Server Error
+ */
 router.delete("/:id", auth(), async (req: CustomRequest, res: Response) => {
   try {
     const id: string = req.params.id;
-    const user: Partial<IUser> = req.user!;
-    await deleteTicket(id);
-    return res.status(200).send(createResponse("TICKET_DELETED", {}));
+    const deletedTicket = await deleteTicket(id);
+    return res
+      .status(200)
+      .send(createResponse("TICKET_DELETED", deletedTicket));
   } catch (error: any) {
     return res
       .status(error.status)
       .send(createErrorResponse(error.message, error.error));
   }
 });
+
+export default router;
