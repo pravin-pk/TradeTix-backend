@@ -22,7 +22,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/tickets:
+ * /api/v1/tickets:
  *   put:
  *     summary: Update a ticket
  *     description: Update a ticket
@@ -50,6 +50,12 @@ const router = express.Router();
  *     reponses:
  *       200:
  *         description: Ticket updated successfully
+ *       400:
+ *         description: Invalid request
+ *       401:
+ *         description: User Unauthorized
+ *       500:
+ *         description: Internal Server Error
  */
 router.put("/:id", auth(), async (req: CustomRequest, res: Response) => {
   try {
@@ -71,7 +77,7 @@ router.put("/:id", auth(), async (req: CustomRequest, res: Response) => {
 
 /**
  * @swagger
- * /api/tickets/{id}:
+ * /api/v1/tickets/{id}:
  *   delete:
  *     summary: Delete ticket by ID
  *     description: Delete ticket by ID
@@ -88,7 +94,9 @@ router.put("/:id", auth(), async (req: CustomRequest, res: Response) => {
  *       200:
  *         description: Ticket deleted successfully
  *       400:
- *         description: Error occurred due to Bad Request
+ *         description: Invalid Request
+ *       401:
+ *         description: User Unauthorized
  *       500:
  *         description: Internal Server Error
  */
@@ -108,7 +116,7 @@ router.delete("/:id", auth(), async (req: CustomRequest, res: Response) => {
 
 /**
  * @swagger
- * /api/tickets/{id}/listings:
+ * /api/v1/tickets/{id}/listings:
  *   post:
  *     summary: Create listing of the ticket by ID
  *     description: Create listing of the ticket by ID
@@ -136,11 +144,14 @@ router.delete("/:id", auth(), async (req: CustomRequest, res: Response) => {
  *               status:
  *                 type: string
  *                 description: Availability status of code
+ *                 example: open
  *     responses:
  *       200:
  *         description: Ticket Listed Successfully
  *       400:
- *         description: Error occurred due to Bad Request
+ *         description: Invalid Request
+ *       401:
+ *         description: User Unauthorized
  *       500:
  *         description: Internal Server Error
  */
@@ -169,7 +180,7 @@ router.post(
 
 /**
  * @swagger
- * /api/tickets/{id}/listings:
+ * /api/v1/tickets/{id}/listings:
  *   get:
  *     summary: Fetch the listings of the ticket
  *     description: Fetch the listings of the ticket
@@ -183,25 +194,13 @@ router.post(
  *         schema:
  *           type: string
  *         description: Ticket ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               price:
- *                 type: number
- *                 description: Price of the ticket to be sold
- *                 example: 300
- *               status:
- *                 type: string
- *                 description: Availability status of code
  *     responses:
  *       200:
- *         description: Ticket Listed Successfully
+ *         description: Ticket fetched Successfully
  *       400:
- *         description: Error occurred due to Bad Request
+ *         description: Invalid Request
+ *       401:
+ *         description: User Unauthorized
  *       500:
  *         description: Internal Server Error
  */

@@ -1,6 +1,7 @@
 import Event, { IEvent } from "../models/event.model";
 import User, { IUser } from "../models/user.model";
 import { FilterQuery } from "mongoose";
+import { HttpError } from "../utils/customExceptionHandler.util";
 
 export const createEvent = async (
   event: Partial<IEvent>,
@@ -25,7 +26,7 @@ export const createEvent = async (
     !validFrom ||
     !validTo
   ) {
-    throw new Error("Please provide all required fields");
+    throw HttpError.badRequest("Event", "Please provide all required fields");
   }
   const newEvent = new Event({
     name,
@@ -73,7 +74,7 @@ export const getEventById = async (
 
   const event = await query.exec();
   if (!event) {
-    throw new Error("Event not found");
+    throw HttpError.notFound("Event", "Event not found");
   }
   return event;
 };
@@ -89,7 +90,7 @@ export const updateEvent = async (
     { new: true }
   );
   if (!updatedEvent) {
-    throw new Error("Event not found");
+    throw HttpError.notFound("Event", "Event not found");
   }
   return updatedEvent;
 };
@@ -97,7 +98,7 @@ export const updateEvent = async (
 export const deleteEvent = async (id: string) => {
   const deletedEvent = await Event.findOneAndDelete({ _id: id });
   if (!deletedEvent) {
-    throw new Error("Event not found");
+    throw HttpError.notFound("Event", "Event not found");
   }
   return deletedEvent;
 };

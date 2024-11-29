@@ -13,7 +13,6 @@ import {
   createErrorResponse,
   createResponse,
 } from "../utils/responseHandler.util";
-import { IUser } from "../models/user.model";
 import { IEvent } from "../models/event.model";
 import { ITicket } from "../models/ticket.model";
 
@@ -28,7 +27,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/events:
+ * /api/v1/events:
  *   post:
  *     summary: Create new Event
  *     description: Create new Event
@@ -45,19 +44,19 @@ const router = express.Router();
  *              name:
  *                type: string
  *                description: Name of the event
- *                example: "Arijit Singh Concert"
+ *                example: "Dua Lipa India Tour"
  *              date:
  *                type: date
  *                description: Date of the event
- *                example: "2022-12-31T00:00:00.000Z"
+ *                example: "2025-01-31T00:00:00.000Z"
  *              venue:
  *                type: string
  *                description: Venue of the event
- *                example: "Mumbai"
+ *                example: "Ahemdabad"
  *              performers:
  *                type: array
  *                description: Performers of the event
- *                example: ["Arijit Singh", "Shreya Ghoshal"]
+ *                example: ["Dua Lipa", "Sabrina Carpenter"]
  *              categories:
  *                type: array
  *                description: Categories of the event
@@ -69,14 +68,18 @@ const router = express.Router();
  *              validFrom:
  *                type: date
  *                description: Valid from date of the event
- *                example: "2022-12-31T00:00:00.000Z"
+ *                example: "2025-01-01T00:00:00.000Z"
  *              validTo:
  *                type: date
  *                description: Valid to date of the event
- *                example: "2022-12-31T00:00:00.000Z"
+ *                example: "2025-01-31T00:00:00.000Z"
  *     responses:
  *       200:
  *         description: Creates new ticket
+ *       400:
+ *         description: Error occurred due to Bad Request  
+ *       500:
+ *         description: Internal Server Error
  */
 router.post("/", auth(), async (req: CustomRequest, res: Response) => {
   try {
@@ -91,7 +94,7 @@ router.post("/", auth(), async (req: CustomRequest, res: Response) => {
 
 /**
  * @swagger
- * /api/events/{id}/tickets:
+ * /api/v1/events/{id}/tickets:
  *   post:
  *     summary: Create new Ticket
  *     description: Create new Ticket for an event
@@ -120,6 +123,12 @@ router.post("/", auth(), async (req: CustomRequest, res: Response) => {
  *     responses:
  *       200:
  *         description: Creates new ticket
+ *       400:
+ *         description: Invalid Request
+ *       401:
+ *         description: User Unauthorized
+ *       500:
+ *         description: Internal Server Error
  */
 router.post(
   "/:id/tickets",
@@ -142,7 +151,7 @@ router.post(
 
 /**
  * @swagger
- * /api/events/{id}/tickets:
+ * /api/v1/events/{id}/tickets:
  *   get:
  *     summary: Get all tickets
  *     description: Get all tickets for an event
@@ -172,6 +181,12 @@ router.post(
  *     responses:
  *       200:
  *         description: Returns all tickets
+ *       400:
+ *         description: Invalid Request
+ *       401:
+ *         description: User Unauthorized
+ *       500:
+ *         description: Internal Server Error
  */
 router.get("/:id/tickets", auth(), async (req: CustomRequest, res: Response) => {
     try {
@@ -198,7 +213,7 @@ router.get("/:id/tickets", auth(), async (req: CustomRequest, res: Response) => 
 
 /**
  * @swagger
- * /api/events:
+ * /api/v1/events:
  *   get:
  *     summary: Get all Events
  *     description: Get all Events
@@ -210,11 +225,13 @@ router.get("/:id/tickets", auth(), async (req: CustomRequest, res: Response) => 
  *         name: limit
  *         schema:
  *           type: number
+ *           example: 10
  *         description: Number of events to get
  *       - in: query
  *         name: page
  *         schema:
  *           type: number
+ *  
  *         description: Page number
  *       - in: query
  *         name: filter
@@ -229,6 +246,12 @@ router.get("/:id/tickets", auth(), async (req: CustomRequest, res: Response) => 
  *     responses:
  *       200:
  *         description: Get all events
+ *       400:
+ *         description: Invalid Request
+ *       401:
+ *         description: User Unauthorized
+ *       500:
+ *         description: Internal Server Error
  */
 router.get("/", auth(), async (req: Request, res: Response) => {
   try {
@@ -249,7 +272,7 @@ router.get("/", auth(), async (req: Request, res: Response) => {
 
 /**
  * @swagger
- * /api/events/{id}:
+ * /api/v1/events/{id}:
  *   get:
  *     summary: Get Event by ID
  *     description: Get Event by ID
@@ -265,6 +288,12 @@ router.get("/", auth(), async (req: Request, res: Response) => {
  *     responses:
  *       200:
  *         description: Get event by ID
+ *       400:
+ *         description: Invalid Request
+ *       401:
+ *         description: User Unauthorized
+ *       500:
+ *         description: Internal Server Error
  */
 router.get("/:id", auth(), async (req: Request, res: Response) => {
   try {
@@ -279,7 +308,7 @@ router.get("/:id", auth(), async (req: Request, res: Response) => {
 
 /**
  * @swagger
- * /api/events/{id}:
+ * /api/v1/events/{id}:
  *   put:
  *     summary: Update Event by ID
  *     description: Update Event by ID
@@ -322,6 +351,12 @@ router.get("/:id", auth(), async (req: Request, res: Response) => {
  *     responses:
  *       200:
  *         description: Update event by ID
+ *       400:
+ *         description: Invalid Request
+ *       401:
+ *         description: User Unauthorized
+ *       500:
+ *         description: Internal Server Error
  */
 router.put("/:id", auth(), async (req: CustomRequest, res: Response) => {
   try {
@@ -336,7 +371,7 @@ router.put("/:id", auth(), async (req: CustomRequest, res: Response) => {
 
 /**
  * @swagger
- * /api/events/{id}:
+ * /api/v1/events/{id}:
  *   delete:
  *     summary: Delete Event by ID
  *     description: Delete Event by ID
@@ -352,6 +387,12 @@ router.put("/:id", auth(), async (req: CustomRequest, res: Response) => {
  *     responses:
  *       200:
  *         description: Delete event by ID
+ *       400:
+ *         description: Invalid Request
+ *       401:
+ *         description: User Unauthorized
+ *       500:
+ *         description: Internal Server Error
  */
 router.delete("/:id", auth(), async (req: CustomRequest, res: Response) => {
   try {

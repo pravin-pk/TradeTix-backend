@@ -9,6 +9,7 @@ import morgan from 'morgan'
 import userRouter from './routers/user.router';
 import eventRouter from './routers/event.router';
 import ticketRouter from './routers/ticket.router';
+import listingRouter from './routers/listing.router';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -38,10 +39,10 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-app.use('/api/users', userRouter);
-// app.use('/api/tickets', ticketRouter);
-app.use('/api/events', eventRouter);
-app.use('/api/tickets', ticketRouter);
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/events', eventRouter);
+app.use('/api/v1/tickets', ticketRouter);
+app.use('/api/v1/listings', listingRouter);
 
 
 app.listen(PORT, () => {

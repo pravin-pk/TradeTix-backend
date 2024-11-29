@@ -1,6 +1,7 @@
 import Ticket, { ITicket } from "../models/ticket.model";
 import Listing, { IListing } from "../models/listing.model";
 import User, { IUser } from "../models/user.model";
+import { HttpError } from "../utils/customExceptionHandler.util";
 
 export const createListing = async (
   listing: Partial<IListing>,
@@ -20,7 +21,7 @@ export const createListing = async (
 export const getListingForTicket = async (ticketID: string) => {
   const listing = await Listing.findOne({ ticketID });
   if (!listing) {
-    throw new Error("Listing not found");
+    throw HttpError.notFound("Listing", "Listing not found");
   }
   return listing;
 };
@@ -36,7 +37,7 @@ export const updateListing = async (
     { new: true }
   );
   if (!updatedListing) {
-    throw new Error("Listing not found");
+    throw HttpError.notFound("Listing", "Listing not found");
   }
   return updatedListing;
 };
@@ -44,7 +45,7 @@ export const updateListing = async (
 export const deleteListing = async (id: string) => {
   const deletedListing = await Listing.findOneAndDelete({ _id: id });
   if (!deletedListing) {
-    throw new Error("Listing not found");
+    throw HttpError.notFound("Listing", "Listing not found");
   }
   return deletedListing;
 };
