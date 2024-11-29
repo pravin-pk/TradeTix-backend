@@ -44,7 +44,7 @@ jobs:
       - name: Set Docker image tag based on branch or tag
         id: set-tag
         run: |
-          if [[ "${GITHUB_REF}" == refs/heads/rel/* ]]; then
+          if [[ "${GITHUB_REF}" == refs/heads/rel@* ]]; then
             VERSION=$(echo "${GITHUB_REF}" | sed 's/^refs\/heads\/rel@//')
             IMAGE_TAG="${VERSION}"
           else
