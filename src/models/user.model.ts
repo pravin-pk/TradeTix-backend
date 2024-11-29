@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 
 export interface IUser extends Document{
     username: string;
-    email: string;
     password: string;
     role: 'user' | 'admin';
     tokens: { token: string}[];
@@ -20,19 +19,13 @@ export interface IUserMethods {
 }
 
 interface UserModel extends Model<IUser, {}, IUserMethods> {
-    findByCredentials(email: string, password: string): Promise<HydratedDocument<IUser, IUserMethods>>
+    findByCredentials(username: string, password: string): Promise<HydratedDocument<IUser, IUserMethods>>
 }
 
 const userSchema = new Schema<IUser, UserModel, IUserMethods>({
     username: {
         type: String,
         required: true,
-        trim: true
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
         trim: true
     },
     password: {
@@ -86,8 +79,8 @@ userSchema.methods.toJSON = function() {
     return userObject;
 }
 
-userSchema.statics.findByCredentials = async function(email: string, password: string) {
-    const user = await User.findOne({ email });
+userSchema.statics.findByCredentials = async function(username: string, password: string) {
+    const user = await User.findOne({ username });
     if(!user) {
         throw new Error('User not found');
     }

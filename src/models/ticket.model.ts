@@ -2,55 +2,44 @@ import { Document, Schema, Model, model, HydratedDocument } from "mongoose";
 import { IUser } from "./user.model";
 
 export interface ITicket extends Document {
-  title: string;
-  description: string;
-  price: number;
-  status: "open" | "sold";
-  owner: IUser;
-  buyer: IUser | null;
-  expiry: Date;
+  eventID: Schema.Types.ObjectId;
+  ownerID: Schema.Types.ObjectId;
+  seatNumber: string;
+  createdBy: IUser;
   createdAt: Date;
+  updatedBy: IUser;
   updatedAt: Date;
 }
 
 export interface ITicketMethods {
-  toJSON(user: "owner" | "buyer" | "user"): ITicket;
+  // toJSON(user: "owner" | "buyer" | "user"): ITicket;
 }
 
 interface TicketModel extends Model<ITicket, {}, ITicketMethods> {}
 
 const ticketSchema = new Schema<ITicket, ITicketMethods>(
   {
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    description: {
-      type: String,
-      trim: true,
-    },
-    price: {
-      type: Number,
-      required: true,
-    },
-    status: {
-      type: String,
-      required: true,
-      enum: ["open", "sold"],
-      default: "open",
-    },
-    owner: {
+    eventID: {
       type: Schema.Types.ObjectId,
+      ref: "Event",
       required: true,
-      ref: "User",
     },
-    buyer: {
+    ownerID: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
-    expiry: {
-      type: Date,
+    seatNumber: {
+      type: String,
+    },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    updatedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
   },
@@ -70,25 +59,25 @@ ticketSchema.pre<ITicket>("findOneAndUpdate", function (next) {
   next();
 });
 
-ticketSchema.methods.toJSON = function (user: "owner" | "buyer" | "user") {
-  const ticket = this as ITicket;
-  const ticketObject = ticket.toObject();
+// ticketSchema.methods.toJSON = function (user: "owner" | "buyer" | "user") {
+//   const ticket = this as ITicket;
+//   const ticketObject = ticket.toObject();
 
-  if (user === "owner") {
-    delete ticketObject.owner.tokens;
-    delete ticketObject.owner.password;
-    delete ticketObject.buyer;
-  } else if (user === "buyer") {
-    delete ticketObject.buyer.tokens;
-    delete ticketObject.buyer.password;
-    delete ticketObject.owner;
-  } else {
-    delete ticketObject.owner;
-    delete ticketObject.buyer;
-  }
+//   if (user === "owner") {
+//     delete ticketObject.owner.tokens;
+//     delete ticketObject.owner.password;
+//     delete ticketObject.buyer;
+//   } else if (user === "buyer") {
+//     delete ticketObject.buyer.tokens;
+//     delete ticketObject.buyer.password;
+//     delete ticketObject.owner;
+//   } else {
+//     delete ticketObject.owner;
+//     delete ticketObject.buyer;
+//   }
 
-  return ticketObject;
-};
+//   return ticketObject;
+// };
 
 const Ticket = model<ITicket, TicketModel>("Ticket", ticketSchema);
 
