@@ -4,12 +4,12 @@ on:
   push:
     branches:
       - 'main'
-      - 'release/*'
       - 'rel/*'
+      - 'rel@*'
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository }}:1.0.0
 
 permissions:
   packages: write
@@ -44,14 +44,15 @@ jobs:
       - name: Set Docker image tag based on branch or tag
         id: set-tag
         run: |
-          if [[ "${GITHUB_REF}" == refs/heads/release/* ]]; then
-            # If it's a release branch (e.g., release/1.0.0), use the version from the branch name
-            VERSION=${GITHUB_REF#refs/heads/release/}
-            IMAGE_TAG="rel-${VERSION}"
+          if [[ "${GITHUB_REF}" == refs/heads/rel/* ]]; then
+            VERSION=$(echo "${GITHUB_REF}" | sed 's/^refs\/heads\/rel@//')
+            IMAGE_TAG="${VERSION}"
           else
             # Default to using 'latest' if it's a different branch
             IMAGE_TAG="latest"
           fi
+          echo "VERSION"=${VERSION}
+          echo "IMAGE_TAG=${IMAGE_TAG}"
           echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
 
       - name: Build and push Docker image
@@ -59,7 +60,7 @@ jobs:
         uses: docker/build-push-action@v6.9.0
         with:
           context: .
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           labels: ${{ steps.meta.outputs.labels }}
           file: ./k8s/Dockerfile
           push: true
