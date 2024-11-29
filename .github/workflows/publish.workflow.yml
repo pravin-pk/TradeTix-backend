@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}:1.0.0
+  IMAGE_NAME: ${{ github.repository }}
 
 permissions:
   packages: write
@@ -60,7 +60,7 @@ jobs:
         uses: docker/build-push-action@v6.9.0
         with:
           context: .
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
           file: ./k8s/Dockerfile
           push: true
