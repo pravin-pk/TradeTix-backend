@@ -1,14 +1,12 @@
-export const createResponse = (status: number, message: string, data?: any) => {
+export const createResponse = (message: string, data?: any) => {
     return {
-        status,
         message,
         data
     }
 }
 
-export const createErrorResponse = (status: number, message: string, error: any) => {
+export const createErrorResponse = (message: string, error: any) => {
     return {
-        status,
         message,
         error
     }

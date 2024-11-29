@@ -1,9 +1,18 @@
-import express from 'express';
-import { IUser } from '../models/user.model';
-import { loginUser, registerUser, addBankDetails, getUserById } from '../controllers/user.controller';
-import auth, { CustomRequest } from '../middlewares/auth.middleware';
-import { Request, Response } from 'express';
-import { createErrorResponse, createResponse } from '../utils/responseHandler.util';
+import express from "express";
+import { IUser } from "../models/user.model";
+import {
+  createUser,
+  getUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+} from "../controllers/user.controller";
+import auth, { CustomRequest } from "../middlewares/auth.middleware";
+import { Request, Response } from "express";
+import {
+  createErrorResponse,
+  createResponse,
+} from "../utils/responseHandler.util";
 
 const router = express.Router();
 
@@ -11,15 +20,15 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Users
- *   description: Operations Related To Tickets.
-*/
+ *   description: Operations Related To Users.
+ */
 
 /**
  * @swagger
- * /api/users/register:
+ * /api/users:
  *   post:
- *     summary: Register a user
- *     description: Register a user
+ *     summary: Create a user
+ *     description: Create a user
  *     tags: [Users]
  *     requestBody:
  *       required: true
@@ -29,8 +38,6 @@ const router = express.Router();
  *             properties:
  *               username:
  *                 type: string
- *               email:
- *                 type: string
  *               password:
  *                 type: string
  *     responses:
@@ -39,157 +46,142 @@ const router = express.Router();
  *       400:
  *         description: Error occurred
  */
-router.post('/register', async (req: Request, res: Response) => {
-    try{
-        const user: Partial<IUser> = {
-            username: req.body.username,
-            email: req.body.email,
-            password: req.body.password
-        }
-        const registeredUser = await registerUser(user);
-        return res.status(201).send(createResponse(201, "USER_REGISTERED", registeredUser));
-    } catch (error: any) {
-        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.error));
-    }
+router.post("/", async (req: Request, res: Response) => {
+  try {
+    const createdUser = await createUser(req.body);
+    return res.status(201).send(createResponse("USER_CREATED", createdUser));
+  } catch (error: any) {
+    return res
+      .status(error.status)
+      .send(createErrorResponse(error.message, error.error));
+  }
 });
 
 /**
  * @swagger
- * /api/users/login:
- *   post:
- *     summary: Login a user
- *     description: Login a user
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             properties:
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: User logged in successfully
- *       400:
- *         description: Error occurred
- */
-router.post('/login', async (req: Request, res: Response) => {
-    try {
-        const user: Partial<IUser> = {
-            email: req.body.email,
-            password: req.body.password
-        }
-        const loggedInUser = await loginUser(user);
-        return res.send(createResponse(200, "USER_LOGGED_IN", loggedInUser));
-    } catch(error: any) {
-        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.error));
-    }
-})
-
-/**
- * @swagger
- * /api/users/logout:
- *   post:
- *     summary: Logout a user
- *     description: Logout a user
- *     tags: [Users]
- *     security:
- *       - BearerAuth: []
- *     responses:
- *       200:
- *         description: User logged out successfully
- */
-router.post('/logout', auth(), async (req: CustomRequest, res: Response) => {
-    try {
-        if(req.user) {
-            req.user.tokens = req.user.tokens.filter((token) => {
-                return token.token !== req.token;
-            })
-            await req.user.save();
-        }
-        return res.status(200).json(createResponse(200, "USER_LOGGED_OUT", "Logged out"));
-    } catch(error: any) {
-        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.error));
-    }
-});
-
-/**
- * @swagger
- * /api/users/me:
+ * /api/users:
  *   get:
- *     summary: Get user profile
- *     description: Get user profile
+ *     summary: Get all users
+ *     description: Get all users
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Returns user profile
+ *         description: Returns all users
  */
-router.get('/me', auth(), async (req: CustomRequest, res: Response) => {
-    try {
-        const userId = req.user!._id;
-        const user = await getUserById(userId as string);
-        return res.status(200).send(createResponse(200, "USER_FETCHED", user));
-    } catch(error: any) {
-        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.error));
-    }
+router.get("/", auth(), async (req: CustomRequest, res: Response) => {
+  try {
+    const users = await getUsers(
+      Number(req.query.limit),
+      Number(req.query.page)
+    );
+    return res.status(200).send(createResponse("USERS_FETCHED", users));
+  } catch (error: any) {
+    return res
+      .status(error.status)
+      .send(createErrorResponse(error.message, error.error));
+  }
 });
 
 /**
  * @swagger
- * /api/users/{userId}/bank-details:
- *   post:
- *     summary: Add bank details
- *     description: Add bank details
+ * /api/users/{id}:
+ *   get:
+ *     summary: Get user by ID
+ *     description: Get user by ID
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: userId
- *         required: true
+ *         name: id
  *         schema:
  *           type: string
- *           description: User ID
- *           example: 60f3b3b3b3b3b3b3b3b3b3b3
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: Get user by ID
+ */
+router.get("/:id", auth(), async (req: CustomRequest, res: Response) => {
+  try {
+    const user = await getUserById(req.params.id);
+    return res.status(200).send(createResponse("USER_FETCHED", user));
+  } catch (error: any) {
+    return res
+      .status(error.status)
+      .send(createErrorResponse(error.message, error.error));
+  }
+});
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   put:
+ *     summary: Update user by ID
+ *     description: Update user by ID
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         description: User ID
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             properties:
- *               accountNumber:
+ *               username:
  *                 type: string
- *                 description: Account number
- *                 example: 1234567890
- *               IFSCCode:
+ *               password:
  *                 type: string
- *                 description: IFSC Code
- *                 example: HDFC0001234
  *     responses:
  *       200:
- *         description: Bank details added successfully
- *       400:
- *         description: Error occurred
- *       404:
- *         description: User not found
- *       500:
- *         description: Internal server error
+ *         description: User updated successfully
  */
-router.post('/:userId/bank-details', auth(), async (req: CustomRequest, res: Response) => {
-    try {
-        const userId = req.params.userId;
-        const accountNumber = req.body.accountNumber;
-        const IFSCCode = req.body.IFSCCode;
-        const updatedUser = await addBankDetails(userId, accountNumber, IFSCCode);
-        return res.status(200).send(createResponse(200, "BANK_DETAILS_ADDED", updatedUser));
-    } catch(error: any) {
-        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.error));
-    }
-})
+router.put("/:id", auth(), async (req: CustomRequest, res: Response) => {
+  try {
+    const user = await updateUser(req.params.id, req.body);
+    return res.status(200).send(createResponse("USER_UPDATED", user));
+  } catch (error: any) {
+    return res
+      .status(error.status)
+      .send(createErrorResponse(error.message, error.error));
+  }
+});
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   delete:
+ *     summary: Delete user by ID
+ *     description: Delete user by ID
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ */
+router.delete("/:id", auth(), async (req: CustomRequest, res: Response) => {
+  try {
+    const user = await deleteUser(req.params.id);
+    return res.status(200).send(createResponse("USER_DELETED", user));
+  } catch (error: any) {
+    return res
+      .status(error.status)
+      .send(createErrorResponse(error.message, error.error));
+  }
+});
 
 export default router;
