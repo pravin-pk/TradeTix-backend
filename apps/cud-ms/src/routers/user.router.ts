@@ -1,16 +1,17 @@
+
 import express from 'express';
-import { IUser } from '../models/user.model';
-import { loginUser, registerUser, addBankDetails, getUserById } from '../controllers/user.controller';
-import auth, { CustomRequest } from '../middlewares/auth.middleware';
 import { Request, Response } from 'express';
-import { createErrorResponse, createResponse } from '../utils/responseHandler.util';
+import { registerUser, loginUser, addBankDetails } from '../../../../controllers/user.controller';
+import auth, { CustomRequest } from '../../../../middlewares/auth.middleware';
+import { IUser } from '../../../../models/user.model';
+import { createResponse, createErrorResponse } from '../../../../utils/responseHandler.util';
 
 const router = express.Router();
 
 /**
  * @swagger
  * tags:
- *   name: Users
+ *   name: Users - CUD
  *   description: Operations Related To Tickets.
 */
 
@@ -111,29 +112,6 @@ router.post('/logout', auth(), async (req: CustomRequest, res: Response) => {
             await req.user.save();
         }
         return res.status(200).json(createResponse(200, "USER_LOGGED_OUT", "Logged out"));
-    } catch(error: any) {
-        return res.status(error.status).send(createErrorResponse(error.status, error.message, error.error));
-    }
-});
-
-/**
- * @swagger
- * /api/users/me:
- *   get:
- *     summary: Get user profile
- *     description: Get user profile
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Returns user profile
- */
-router.get('/me', auth(), async (req: CustomRequest, res: Response) => {
-    try {
-        const userId = req.user!._id;
-        const user = await getUserById(userId as string);
-        return res.status(200).send(createResponse(200, "USER_FETCHED", user));
     } catch(error: any) {
         return res.status(error.status).send(createErrorResponse(error.status, error.message, error.error));
     }
