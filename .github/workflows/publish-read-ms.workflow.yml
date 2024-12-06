@@ -1,0 +1,65 @@
+name: Staging read-ms to GitHub Registry
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'rel@*'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+permissions:
+  packages: write
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log into registry
+        uses: docker/login-action@v3.3.0
+        with:
+          logout: false
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.REPO_GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5.5.1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          
+      - name: Set Docker image tag based on branch or tag
+        id: set-tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/heads/rel@* ]]; then
+            VERSION=$(echo "${GITHUB_REF}" | sed 's/^refs\/heads\/rel@//')
+            IMAGE_TAG="${VERSION}"
+          else
+            # Default to using 'latest' if it's a different branch
+            IMAGE_TAG="latest"
+          fi
+          echo "VERSION"=${VERSION}
+          echo "IMAGE_TAG=${IMAGE_TAG}"
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
+
+      - name: Build and push read-ms Docker image
+        id: build-and-push
+        uses: docker/build-push-action@v6.9.0
+        with:
+          context: .
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:read-ms-${{ env.IMAGE_TAG }}
+          labels: ${{ steps.meta.outputs.labels }}
+          file: ./k8s/read-ms/Dockerfile
+          push: true
