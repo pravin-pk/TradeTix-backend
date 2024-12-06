@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'main'
-      - 'rel/*'
       - 'rel@*'
 
 env:
@@ -62,5 +61,5 @@ jobs:
           context: .
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
-          file: ./k8s/Dockerfile
+          file: ./k8s/*
           push: true

@@ -1,7 +1,9 @@
 {
   "scripts": {
-    "start": "node dist/server.js",
-    "dev": "env-cmd nodemon --exec ts-node src/server.ts",
+    "start:read-ms": "node dist/apps/read-ms/src/server.js",
+    "start:cud-ms": "node dist/apps/cud-ms/src/server.js",
+    "dev:read-ms": "env-cmd nodemon --exec ts-node apps/read-ms/src/server.ts",
+    "dev:cud-ms": "env-cmd nodemon --exec ts-node apps/cud-ms/src/server.ts",
     "build": "tsc -p ."
   },
   "dependencies": {

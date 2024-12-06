@@ -1,16 +1,17 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
-import { setupSwagger } from './configs/swagger.config';
+import { setupSwagger } from '../../../configs/swagger.config';
 import cors from 'cors';
 import morgan from 'morgan'
 
 // Routes
-import userRouter from './routers/user.router';
 import ticketRouter from './routers/ticket.router';
+import userRouter from './routers/user.router';
+
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(bodyParser.json());
@@ -42,5 +43,5 @@ app.use('/api/tickets', ticketRouter);
 
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`READ Server is running on http://localhost:${PORT}`);
 });
