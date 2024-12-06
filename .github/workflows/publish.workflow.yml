@@ -54,12 +54,22 @@ jobs:
           echo "IMAGE_TAG=${IMAGE_TAG}"
           echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
 
-      - name: Build and push Docker image
+      - name: Build and push read-ms Docker image
         id: build-and-push
         uses: docker/build-push-action@v6.9.0
         with:
           context: .
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:read-ms-${{ env.IMAGE_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
-          file: ./k8s/*
+          file: ./k8s/read-ms/Dockerfile
+          push: true
+
+      - name: Build and push cud-ms Docker image
+        id: build-and-push
+        uses: docker/build-push-action@v6.9.0
+        with:
+          context: .
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:cud-ms-${{ env.IMAGE_TAG }}
+          labels: ${{ steps.meta.outputs.labels }}
+          file: ./k8s/read-ms/Dockerfile
           push: true
